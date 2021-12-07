@@ -7,6 +7,7 @@ use std::{
 struct Course {
     depth: usize,
     horizontal: usize,
+    aim: usize,
 }
 
 impl Course {
@@ -14,18 +15,23 @@ impl Course {
         Course {
             depth: 0,
             horizontal: 0,
+            aim: 0,
         }
     }
 
     fn mv(&mut self, mve: &Move) {
         match mve {
-            Move::Forward(v) => self.horizontal += v,
-            Move::Down(v) => self.depth += v,
-            Move::Up(v) => self.depth -= v,
+            Move::Forward(v) => {
+                self.horizontal += v;
+                self.depth += self.aim * v;
+            }
+            Move::Down(v) => self.aim += v,
+            Move::Up(v) => self.aim -= v,
         }
     }
 
     fn finish(&self) -> usize {
+        println!("{} and {}", &self.horizontal, &self.depth);
         &self.horizontal * &self.depth
     }
 }
@@ -109,5 +115,5 @@ fn test_aoc_case() {
     ];
 
     let mut c = Course::new();
-    assert_eq!(150, chart_course(&mut c, v))
+    assert_eq!(900, chart_course(&mut c, v))
 }
