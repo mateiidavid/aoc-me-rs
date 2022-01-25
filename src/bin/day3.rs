@@ -4,6 +4,59 @@ use std::{
     path::Path,
 };
 
+fn get_digit(number: &str, index: usize) -> Option<usize> {
+    let digit = number.chars().nth(index);
+    if digit.is_none() {
+        return None;
+    };
+
+    Some(digit.unwrap().to_digit(2).unwrap() as usize)
+}
+
+fn dg_oxygen_rating(v: &mut Vec<String>) {
+    let mut numbers = v.iter();
+    let mut index = 0;
+    let mut found = vec![];
+    loop {
+        let bit = mcv(&v, index);
+        while let Some(number) = numbers.next() {
+            let digit = get_digit(number, index);
+            match digit {
+                Some(d) => {
+                    if d == bit {
+                        found.push(number.to_owned());
+                    };
+                }
+                None => {}
+            }
+        }
+
+        if found.len() < 2 {
+            break;
+        } else {
+            index += 1;
+            numbers = found.iter();
+        }
+    }
+}
+
+fn mcv(numbers: &Vec<String>, index: usize) -> usize {
+    let mut numbers = numbers.iter();
+    let mut freq = [0, 0];
+    while let Some(number) = numbers.next() {
+        match get_digit(number, index) {
+            Some(val) => freq[val] += 1,
+            None => {}
+        }
+    }
+
+    if freq[0] > freq[1] {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
 fn dg_power_report(v: &mut Vec<String>) -> usize {
     let mut gamma = String::new();
     let mut eps = String::new();
@@ -13,13 +66,13 @@ fn dg_power_report(v: &mut Vec<String>) -> usize {
     let mut freq = [0, 0];
     loop {
         while let Some(number) = numbers.next() {
-            let digit = number.chars().nth(index);
-            if digit.is_none() {
-                finished = true;
-                break;
+            match get_digit(number, index) {
+                Some(val) => freq[val] += 1,
+                None => {
+                    finished = true;
+                    break;
+                }
             }
-            let val = digit.unwrap().to_digit(2).unwrap();
-            freq[val as usize] += 1;
         }
 
         if finished {
@@ -71,7 +124,7 @@ where
 }
 fn main() {
     let mut v = read_file("day3.in").unwrap();
-    println!("{}", dg_report(&mut v));
+    println!("{}", dg_power_report(&mut v));
 }
 
 #[test]
@@ -90,5 +143,5 @@ fn test_loop_basic() {
         String::from("00010"),
         String::from("01010"),
     ];
-    assert_eq!(198, dg_report(&mut v));
+    assert_eq!(198, dg_power_report(&mut v));
 }
